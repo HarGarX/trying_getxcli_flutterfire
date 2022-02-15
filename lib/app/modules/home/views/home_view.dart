@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutterfire_ui/database.dart';
 
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -60,7 +61,8 @@ class HomeView extends GetView<HomeController> {
                     height: 20,
                   ),
                   Text(
-                    "Enter Your Wight",
+                    "Enter Your Wight \n  ⚖️",
+                    textAlign: TextAlign.center,
                     style: GoogleFonts.adventPro(
                       fontSize: 26.0,
                       color: Color.fromARGB(167, 0, 0, 0),
@@ -100,29 +102,60 @@ class HomeView extends GetView<HomeController> {
                   SizedBox(
                     height: 20,
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      // controller.login().then((value) {
-                      //   if (value.runtimeType == UserCredential) {
-                      //     Get.off(() => HomeView());
-                      //   } else {}
-                      // });
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          controller.storeToDataBase(
+                              controller.wightTextEditingController.text);
+                          controller.wightTextEditingController.clear();
+                        },
+                        child: Text(
+                          'Submit',
+                          style: GoogleFonts.adventPro(
+                            fontSize: 20.0,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          fixedSize: Size(170.0, 50.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          controller.getFromDataBase();
+                        },
+                        child: Text(
+                          'Show Data',
+                          style: GoogleFonts.adventPro(
+                            fontSize: 20.0,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          fixedSize: Size(170.0, 50.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  FirebaseDatabaseListView(
+                    query: controller.ref.orderByPriority(),
+                    itemBuilder: (context, snapshot) {
+                      Map<String, dynamic> user =
+                          snapshot.value as Map<String, dynamic>;
+
+                      return Text('User name is ${user['name']}');
                     },
-                    child: Text(
-                      'Submit',
-                      style: GoogleFonts.adventPro(
-                        fontSize: 20.0,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      fixedSize: Size(170.0, 50.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                    ),
-                  )
+                  ),
                 ],
               ),
             );

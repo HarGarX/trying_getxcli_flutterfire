@@ -10,7 +10,7 @@ import '../controllers/login_controller.dart';
 class LoginView extends GetView<LoginController> {
   @override
   Widget build(BuildContext context) {
-    controller.onInit();
+    // controller.onInit();
     return Scaffold(
       appBar: AppBar(
         title: Text('LoginView'),
@@ -29,7 +29,7 @@ class LoginView extends GetView<LoginController> {
           children: [
             Center(
               child: Text(
-                "Welcom to The simple Wight Tracker App ,\n Please Login :)",
+                "Welcom to The simple Wight Tracker App ,\n Please Login \n 🐣 ",
                 textAlign: TextAlign.center,
                 style: GoogleFonts.adventPro(
                   fontSize: 30.0,
