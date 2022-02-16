@@ -1,10 +1,9 @@
-import 'dart:convert';
-import 'dart:ffi';
+import 'package:intl/intl.dart';
 
 import 'package:example_example/app/data/wight_model.dart';
 import 'package:example_example/app/modules/login/controllers/login_controller.dart';
 import 'package:example_example/app/modules/login/views/login_view.dart';
-import 'package:example_example/app/routes/app_pages.dart';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -34,30 +33,43 @@ class HomeController extends GetxController {
     super.onInit();
   }
 
+  void deleteWight(String wight) async {
+    ref = FirebaseDatabase.instance.ref("wights/$wight");
+    await ref.remove();
+    update();
+  }
+
   void storeToDataBase(String wight) async {
     WightModel wightModel =
         WightModel(wight: wight, dateTime: DateTime.now().toString());
-    await ref.set(wightModel.toJson());
+    await ref
+        .push()
+        .set(wightModel.toJson())
+        .then((value) => getFromDataBase());
   }
 
   void getFromDataBase() async {
-    stream = ref.onValue;
-    stream.listen((DatabaseEvent event) {
-      // for (var element in event.snapshot.children) {
-      //   print(element.value);
-      // }
-      for (var e in event.snapshot.children) {
-        print(e);
+    DatabaseEvent event = await ref.once();
+    wightsList.clear();
+    for (var element in event.snapshot.children) {
+      print(element.value);
+      wightsList.add(WightModel.fromJson(element.value.toString()));
+    }
+
+    // print(DateFormat('yyyy-MM-dd  kk:mm')
+    //     .format(DateTime.parse(wightsList[1].dateTime)));
+    wightsList.sort(((a, b) {
+      if (DateTime.parse(a.dateTime)
+              .difference(DateTime.parse(b.dateTime))
+              .inSeconds >
+          DateTime.parse(b.dateTime)
+              .difference(DateTime.parse(a.dateTime))
+              .inSeconds) {
+        return 0;
+      } else {
+        return 1;
       }
-
-      // // wightsList.forEach((element) {
-      // //   print("WIGHT LIST ${element.wight} || ${element.dateTime}");
-      // // });
-
-      // print('Event Type: ${event.type}'); // DatabaseEventType.value;
-      // print(
-      //     'Snapshot: ${WightModel.fromJson(event.snapshot.value.toString())}'); // DataSnapshot
-    });
+    }));
   }
 
   Future<void> logout() async {

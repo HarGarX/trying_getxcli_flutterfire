@@ -56,7 +56,7 @@ class LoginView extends GetView<LoginController> {
                             });
                           },
                           child: Text(
-                            'Login Please',
+                            'Login ',
                             style: GoogleFonts.adventPro(
                               fontSize: 20.0,
                               color: Colors.white,

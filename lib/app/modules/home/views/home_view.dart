@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/database.dart';
 
+import 'package:intl/intl.dart';
+
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -56,9 +58,10 @@ class HomeView extends GetView<HomeController> {
               color: Colors.white,
               child: Column(
                 mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   SizedBox(
-                    height: 20,
+                    height: 5,
                   ),
                   Text(
                     "Enter Your Wight \n  ⚖️",
@@ -100,10 +103,11 @@ class HomeView extends GetView<HomeController> {
                     ),
                   ),
                   SizedBox(
-                    height: 20,
+                    height: 10,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       ElevatedButton(
                         onPressed: () {
@@ -126,6 +130,9 @@ class HomeView extends GetView<HomeController> {
                           ),
                         ),
                       ),
+                      SizedBox(
+                        width: 5.0,
+                      ),
                       ElevatedButton(
                         onPressed: () {
                           controller.getFromDataBase();
@@ -147,15 +154,86 @@ class HomeView extends GetView<HomeController> {
                       ),
                     ],
                   ),
-                  FirebaseDatabaseListView(
-                    query: controller.ref.orderByPriority(),
-                    itemBuilder: (context, snapshot) {
-                      Map<String, dynamic> user =
-                          snapshot.value as Map<String, dynamic>;
-
-                      return Text('User name is ${user['name']}');
-                    },
+                  SizedBox(
+                    height: 10.0,
                   ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: GetX<HomeController>(
+                        //autoRemove: false,
+                        //assignId: false,
+                        init: HomeController(),
+                        initState: (state) {
+                          controller.wightsList;
+                        },
+                        builder: (_) {
+                          return controller.wightsList.isEmpty
+                              ? Center(child: CircularProgressIndicator())
+                              : ListView.builder(
+                                  physics: NeverScrollableScrollPhysics(),
+                                  scrollDirection: Axis.vertical,
+                                  itemCount: controller.wightsList.length,
+                                  shrinkWrap: true,
+                                  itemBuilder: (context, index) {
+                                    return Card(
+                                      shadowColor: Colors.black87,
+                                      elevation: 1.5,
+                                      margin: EdgeInsets.all(5.0),
+                                      shape: RoundedRectangleBorder(
+                                        side: BorderSide(
+                                            color:
+                                                Color.fromARGB(167, 15, 11, 11),
+                                            width: 1.0),
+                                        borderRadius:
+                                            BorderRadius.circular(5.0),
+                                      ),
+                                      child: ListTile(
+                                        leading: Icon(
+                                          Icons.edit,
+                                          color:
+                                              Color.fromARGB(167, 15, 11, 11),
+                                        ),
+                                        title: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              'Date & Time : ${DateFormat('yyyy-MM-dd  kk:mm').format(DateTime.parse(controller.wightsList[index].dateTime))}',
+                                              textAlign: TextAlign.justify,
+                                              style: GoogleFonts.adventPro(
+                                                fontSize: 18.0,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                            Text(
+                                              'Wight : ${controller.wightsList[index].wight} KG.',
+                                              textAlign: TextAlign.justify,
+                                              style: GoogleFonts.adventPro(
+                                                fontSize: 18.0,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        trailing: GestureDetector(
+                                          onTap: (() => controller.deleteWight(
+                                              controller
+                                                  .wightsList[index].wight)),
+                                          child: Icon(
+                                            Icons.delete,
+                                            color: Colors.red,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  });
+                        },
+                      ),
+                    ),
+                  )
                 ],
               ),
             );
